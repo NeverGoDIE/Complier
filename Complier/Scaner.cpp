@@ -1,4 +1,4 @@
-#include  "Scaner.h"
+﻿#include  "Scaner.h"
 
 
 Scaner::Scaner(string filename){
@@ -6,15 +6,21 @@ Scaner::Scaner(string filename){
     this->pos = 0;
     readFile();
     delAnnotation();
+	makevector();
+	printInput();
 }
 
 wordtype Scaner::scan(){
+	cout << "=========================" << endl;
     cout << "scan start!" << endl;
-    wordtype wdt = {-1, ""};
+    wordtype wdt = {-1};
     token.clear();
+	cout << "pos = " << pos << endl;
     gainch();
     cout << "ch = " << ch << endl;
+	cout << "pos = " << pos << endl;
     getbc();
+	
     if(isLetter(ch)){
         cout << "found a letter first!" << endl;
         while(isLetter(ch) || isDigit(ch)){
@@ -31,12 +37,12 @@ wordtype Scaner::scan(){
         wdt.word = token;
         return wdt;
     }
-    if(ch=='+' || ch=='-' || isDigit(ch)){
+    else if(ch=='+' || ch=='-' || isDigit(ch)){
         cout << "maybe digits!" << endl;
         if(ch=='+' || ch=='-'){
             cout << "have a +/-!" << endl;
             token = concat(ch, token);
-            if(pretoken.type==20 || pretoken.type==10){
+            if(pretoken.type==20 || pretoken.type==10 || pretoken.type==27) {
                 if(ch=='+'){
                     cout << "after digit, it's a +!" << endl;
                     pretoken.word = token;
@@ -95,8 +101,9 @@ wordtype Scaner::scan(){
         }
         cout << "got integer!" << endl;
         if(ch!='.' && ch!='e'){
-            retract();
-            pretoken.word = dtb(token);
+            if(!isDigit(ch))
+				retract();
+			pretoken.word = dtb(token);
             pretoken.type = 20;
             wdt.type = 20;
             wdt.word = dtb(token);
@@ -116,10 +123,21 @@ wordtype Scaner::scan(){
                 }
 
                 cout << "finished." << endl;
-            }
+				cout << "pos:" << pos << endl;
+			}
+			else {
+				retract();
+				token = concat(ch, token);
+				pretoken.word = token;
+				pretoken.type = -1;
+				wdt.type = -1;
+				wdt.word = token;
+				return wdt;
+			}
             if(ch=='e'){
             }else{//do some error dealing staff
-                retract();
+                if(!isdigit(ch))
+					retract();
                 pretoken.word = dtb(token);
                 pretoken.type = 20;
                 wdt.type = 20;
@@ -164,7 +182,7 @@ wordtype Scaner::scan(){
                     if(!gainch())
                         break;
                 }
-                if(pos < fileLen)
+                if(!isDigit(ch))
                     retract();
 
             }
@@ -173,9 +191,10 @@ wordtype Scaner::scan(){
         pretoken.type = 20;
         wdt.type = 20;
         wdt.word = dtb(token);
+		cout << "pos" << pos << endl;
         return wdt;
     }
-    if(ch == '='){
+    else if(ch == '='){
         token = concat(ch, token);
         if(!gainch()){
             wdt.type = 21;
@@ -185,6 +204,7 @@ wordtype Scaner::scan(){
             return wdt;
         }
         if(ch == '='){
+			token = concat(ch, token);
             wdt.type = 36;
             wdt.word = token;
             pretoken.type = wdt.type;
@@ -195,52 +215,52 @@ wordtype Scaner::scan(){
         wdt.type = 21;
         wdt.word = token;
     }
-    if(ch == '*'){
+    else if(ch == '*'){
         token = concat(ch, token);
         wdt.type = 24;
         wdt.word = token;
     }
-    if(ch == '/'){
+    else if(ch == '/'){
         token = concat(ch, token);
         wdt.type = 25;
         wdt.word = token;
 
     }
-    if(ch == '('){
+    else if(ch == '('){
         token = concat(ch, token);
         wdt.type = 26;
         wdt.word = token;
     }
-    if(ch == ')'){
+    else if(ch == ')'){
         token = concat(ch, token);
         wdt.type = 27;
         wdt.word = token;
     }
-    if(ch == '{'){
+    else if(ch == '{'){
         token = concat(ch, token);
         wdt.type = 28;
         wdt.word = token;
 
     }
-    if(ch == '}'){
+    else if(ch == '}'){
         token = concat(ch, token);
         wdt.type = 29;
         wdt.word = token;
 
     }
-    if(ch == ','){
+    else if(ch == ','){
         token = concat(ch, token);
         wdt.type = 30;
         wdt.word = token;
 
     }
-    if(ch == ';'){
+    else if(ch == ';'){
         token = concat(ch, token);
         wdt.type = 31;
         wdt.word = token;
 
     }
-    if(ch == '<'){
+    else if(ch == '<'){
         token = concat(ch, token);
         if(!gainch()){
             wdt.type = 32;
@@ -250,6 +270,7 @@ wordtype Scaner::scan(){
             return wdt;
         }
         if(ch == '='){
+			token = concat(ch, token);
             wdt.type = 33;
             wdt.word = token;
             pretoken.type = wdt.type;
@@ -260,7 +281,7 @@ wordtype Scaner::scan(){
         wdt.type = 32;
         wdt.word = token;
     }
-    if(ch == '>'){
+    else if(ch == '>'){
         token = concat(ch, token);
         if(!gainch()){
             wdt.type = 34;
@@ -270,6 +291,7 @@ wordtype Scaner::scan(){
             return wdt;
         }
         if(ch == '='){
+			token = concat(ch, token);
             wdt.type = 35;
             wdt.word = token;
             pretoken.type = wdt.type;
@@ -280,12 +302,13 @@ wordtype Scaner::scan(){
         wdt.type = 34;
         wdt.word = token;
     }
-    if(ch == '!'){
+    else if(ch == '!'){
         token = concat(ch, token);
         if(!gainch()){
             return wdt;
         }
         if(ch == '='){
+			token = concat(ch, token);
             wdt.type = 37;
             wdt.word = token;
             pretoken.type = wdt.type;
@@ -294,11 +317,16 @@ wordtype Scaner::scan(){
         }
         retract();
     }
-    if(ch == '#'){
+    else if(ch == '#'){
         token = concat(ch, token);
         wdt.type = 0;
         wdt.word = token;
     }
+	else {
+		token = concat(ch, token);
+		wdt.type = -2;
+		wdt.word = token;
+	}
     pretoken.type = wdt.type;
     pretoken.word = wdt.word;
     return wdt;
@@ -354,6 +382,7 @@ void Scaner::getbc(){
     //if the character we got is blank, retrieve next ch.
     while(ch=='\0' || ch=='\t' || ch=='\r' || ch=='\n'
         || ch=='\v' || ch=='\f' || ch=='\x20' && pos<fileLen){
+			
             if(!gainch())
                 break;
             //cout << "  pos = " << pos << endl;
@@ -440,6 +469,7 @@ void Scaner::readFile(){
     ifile.seekg(0, std::ios::beg);
     char *buffer = new char[length];
     ifile.read(buffer, length);
+	cout << fileLen << endl;
     cout << "retrieve complete!" << endl;
     ifile.close();
     cout << "file closed!" << endl;
@@ -448,13 +478,17 @@ void Scaner::readFile(){
 
 string Scaner::dtb(string str){
 //convert
+	bool isnegetive = false;
     double n;
     double num_n;
-    int num_e;
+    int num_e,i_n;
     char * writable = new char[str.size() + 1];
     memcpy(writable, str.c_str(), str.size()+1);
     writable[str.size()] = '\0';
     int i = 0;
+	if (str[0] == '-')
+		isnegetive = true;
+	//cout << "1" << endl;
     for(i=0; i<str.size(); i++){
         if(writable[i]=='e'){
             break;
@@ -466,29 +500,83 @@ string Scaner::dtb(string str){
     sub_n[i] = '\0';
     memcpy(sub_e, &writable[i+1], str.size()-i);
     sub_e[str.size()-i] = '\0';
-    cout << "n:" << sub_n << " e:" << sub_e << endl;
-    num_n = atof(sub_n);
+    //cout << "n:" << sub_n << " e:" << sub_e << endl;
+	int b=0;
+	int dot=0;
+	i_n = 0;
+	//cout << "2" << endl;
+	for (int j = i - 1; j >=0; j--) {
+		//cout << "i_n:" << i_n << endl;
+		if (sub_n[j] == '.') {
+			dot = i-1-j;
+			continue;
+		}
+		if (sub_n[j] == '+' || sub_n[j] == '-') {
+			break;
+		}
+		//cout << "j:" << j; 
+		//cout << " sub_n[j]:" << sub_n[j] << endl;
+			
+		int a = (int)sub_n[j] - '0';
+
+		for (int k = b; k > 0; k--) {
+			a *= 10;
+		}
+		i_n += a;
+		b++;
+
+	}
+	//cout << "a:" << i_n << endl;
+	//cout << "3" << endl;
+	num_n = (double)i_n;
+	//cout << "dot" << dot << endl;
+	for (int k = dot; k > 0; k--) {
+		num_n /= 10.0;
+	}
+
+	//printf("num_n=%.10g\n", num_n);
+	//cout << "num_n:" << num_n << endl;
+
     num_e = atoi(sub_e);
-    cout << "cn:" << num_n << " ce:" << num_e <<endl;
+	//printf("sub_e=%s\n", sub_e);
+	//cout << num_e << endl;
     n = num_n;
     if(num_e > 0){
         for(i=0; i<num_e; i++)
-            n *= 10;
+            n *= 10.0;
     }else{
         for(i=0; i>num_e; i--)
-            n /= 10;
+            n /= 10.0;
     }
-    cout << n << endl;
-    //convert to string
-    std::ostringstream strs;
-    strs << n;
-    str = strs.str();
+	if (isnegetive)
+		n = -n;
+    //cout << "www" << n << endl;
+	char s[255];
+	sprintf_s(s, "%.13g", n);
+	//cout << " s:" << s << endl;
+	str = s;
     return str;
 }
 
 void Scaner::retract(){//reverse a position
     pos -= 2;
     gainch();
+}
+
+void Scaner::makevector() {
+	//ofstream file;
+	//file.open("result.txt", ios::out);
+	//cout << "f" << fileLen << endl;
+	//cout << "fileLen: " << fileLen - 1 << endl;
+	while (pos <= fileLen - 1) {
+		wordtype w = scan();
+		if (w.type == -2)
+			continue;
+		else {
+			input.push_back(w);
+		}
+	}
+	//file.close();
 }
 
 void Scaner::test(){
@@ -541,9 +629,20 @@ void Scaner::test(){
 
     ofstream file;
     file.open("result.txt", ios::out);
-    while(pos < fileLen){
+	cout << "f" << fileLen << endl;
+	cout << "fileLen: " << fileLen -1 << endl;
+    while(pos < fileLen-1){
 		wordtype w = scan();
-		if (w.type != -1){
+		if (w.type == -2)
+			continue;
+		else if(w.type == 20){
+			cout << setiosflags(ios::fixed);
+			cout << "wd:( " << w.type << ",  " << w.word << ", " << pos << ")" << endl;
+			cout << "++++++++++++++++++++++++++++++++++++++" << endl;
+			file << "(" << w.type << ", ";
+			file << setprecision(10) << w.word << ")" << endl;
+		}
+		else if (w.type != -1){
 			cout << "wd:( " << w.type << ",  " << w.word << ", " << pos << ")" << endl;
             cout << "++++++++++++++++++++++++++++++++++++++" << endl;
             file << "(" << w.type << ", " << w.word << ")" <<endl;
@@ -559,4 +658,12 @@ void Scaner::test(){
     cout << dtb("-1324e-1000") << endl;*/
 
 
+}
+
+void Scaner::printInput() {
+	vector<wordtype>::iterator it = input.begin();
+	for (; it != input.end(); it++) {
+		cout << '<' << it->type << ", ";
+		cout << it->word << '>' << endl;
+	}
 }

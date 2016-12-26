@@ -146,11 +146,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Scaner.h" />
+    <ClInclude Include="Semanteme.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Scaner.cpp" />
+    <ClCompile Include="Semanteme.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="testFollow.txt" />
+    <Text Include="testParse.txt" />
+    <Text Include="testscan.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

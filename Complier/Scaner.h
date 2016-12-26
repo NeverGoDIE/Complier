@@ -8,16 +8,22 @@
 #include <cstdlib>
 #include <sstream>
 #include <vector>
+#include <iomanip>
 
 using namespace std;
 
 #define KEYWDNUM 9
 
 typedef int POSITION;
-typedef struct{
-int type;
-string word;
-}wordtype;
+
+
+class wordtype {
+public:
+	int type;
+	string word;
+};
+
+
 
 
 class Scaner{
@@ -45,5 +51,8 @@ public:
     void readFile();
     void test();
     void delAnnotation();
+	vector<wordtype> input;
+	void makevector();
+	void printInput();
 };
 #endif // SCANER
