@@ -428,10 +428,11 @@ void Scaner::delAnnotation(){
                     cout << "found /* here: " << pos << endl;
                     while(gainch()){
                         if(ch=='*' && gainch()){
-                            if(ch=='/')
-                                cout << "found */ here.: " << pos << endl;
-                                p_end = pos;
-                                break;
+							if (ch == '/') {
+								cout << "found */ here.: " << pos << endl;
+								p_end = pos;
+								break;
+							}
                         }
                     }
                 }

@@ -17,7 +17,7 @@ class Semanteme {
 private:
 	vector<QUAD> QUAD_table;	//store quaternion
 	
-	int nsuffix, nNXQ, ntc, nfc;
+	int nsuffix=0, nNXQ=1;
 	Scaner scan = Scaner("testscan.txt"); 
 	vector<wordtype>::iterator it = scan.input.begin();
 	wordtype nWord = { it->type, it->word };
@@ -55,17 +55,18 @@ private:
 	};
 
 public:
-	void Expression();
-	void Item();
-	void Factor();
-	void Condition();
+	Semanteme();
+
+	string Expression();
+	string Item();
+	string Factor();
+	void Condition(int *etc, int *efc);
 	void Condition_Statement();
 	void Loop_Statement();
 	void Assignment_Statement();
-	
 	void Statement();
 	void Statement_Sequence();
-	void Statement_Block();
+	int Statement_Block();
 	void Parse();
 	
 	void gen(QUAD quaternion);
@@ -76,6 +77,8 @@ public:
 	void readNext();
 	void retract();
 	void error(string errmsg);
+
+	void print_QUADtable();
 
 	void test();
 };
